@@ -56,15 +56,16 @@ Note:
     * #exit
 	
 # Getting the EBP Return Address
-  * //Open stack in gdb and dissasemble buffer  
+  * Open stack in gdb and dissasemble buffer  
     * $gdb stack  
     * (gdb) disassemble bof  
   
-  * //look for the lea instruction address should look something like 0xffffd2c8 <+12>: lea -0x76(%ebp), %eax  
-  * //copy the address and set a breakpoint  
+  * Look for the lea instruction address should look something like:
+    * 0xffffd2c8 <+12>: lea -0x76(%ebp), %eax  
+  * copy the address and set a breakpoint  
     * (gdb) b* 0xffffd2c8  
 
-  * //Run and get ebp return adress  
+  * Run and get ebp return adress  
     * (gdb) run  
     * (gdb) i r $ebp  
-  * // copy address and put it in correct buffer index at exploit.c  
+  * Copy address and put it in correct buffer index at exploit.c  
